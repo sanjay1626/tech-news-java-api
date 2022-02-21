@@ -7,45 +7,33 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
 //Creating class annotation for User-Class
-/**@Entity marks this as a persistable object, so that the User class can map to a table.*/
-/**@JsonIgnoreProperties specifies properties that should be ignored when serializing this object to JSON.
- The two arguments that follow the annotation are the properties to be ignored.
- Note that you could add many more if necessary.*/
-/**@Table specifies the name of the table that this class maps to.
- * If this annotation isn't present, the table name will be the class name by default.*/
+
+
 
 @Entity
 @JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 @Table(name = "user")
 
 //Create the Instance Variable-Level Annotations for the User Class
-/**With the class created, along with its class-level annotations, we can start adding instance variables.
- *  We'll create eight instance variables: id, username, email, password, loggedIn, posts, votes, and comments.
- *  Of those, the posts, votes, and comments instance variables will be lists—collections of objects of the same type.
- *  Add the following code to create these instance variables:*/
 
-    public class User {
+
+    public class User implements Serializable {
     //Proper instance-level annotations
-    /** First, we want to attach the @Id and @GeneratedValue annotations to the id private variable.
-     * The first signals that id will be used as the unique identifier, and the second denotes that it will be a generated value.
-     * We'll pass an argument into @GeneratedValue to say that this number should be generated automatically,
-     * by adding (strategy = GenerationType.AUTO).*/
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     private String username;
-    /**add the annotation @Column(unique = true) to email,
-     *  to signal that this value must be unique;
-     *  duplicates won't be allowed. With that, the email variable*/
+
     @Column(unique = true)
     private String email;
     private String password;
-    /**@Transient to the loggedIn variable. @Transient signals to Spring Data JPA that this data is NOT to be persisted in the database,
-     * because we don't need or want a user's logged-in status to persist in the data.*/
+
     @Transient
     boolean loggedIn;
 
@@ -57,8 +45,8 @@ import java.util.Objects;
     // Need to use FetchType.LAZY to resolve multiple bags exception
     @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Vote> votes;
-    // Need to use FetchType.LAZY to resolve multiple bags exception
-    @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+
+    @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Comment> comments;
     /**Note that the Posts variable gets the FetchType of EAGER,
      *  meaning that this list will gather all of its necessary information immediately after being created,
@@ -106,6 +94,38 @@ import java.util.Objects;
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isLoggedIn() {
+        return loggedIn;
+    }
+
+    public void setLoggedIn(boolean loggedIn) {
+        this.loggedIn = loggedIn;
+    }
+
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
+    }
+
+    public List<Vote> getVotes() {
+        return votes;
+    }
+
+    public void setVotes(List<Vote> votes) {
+        this.votes = votes;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 
     @Override
